@@ -1,6 +1,5 @@
-import json
-from pathlib import Path
-from urllib.parse import unquote, quote
+from urllib.parse import quote, unquote
+from src.config import R2_PUBLIC_URL, R2_BUCKET_PREFIX
 
 STYLE_MAP = {
     "아방가르드":       "avant_garde",
@@ -29,36 +28,17 @@ STYLE_MAP = {
     "웨스턴":          "western",
 }
 
+
+def build_image_url(style: str, file_id: int) -> str:
+    """스타일(영문) + 파일번호 → R2 이미지 URL"""
+    folder = STYLE_MAP.get(style, style)  # 한글이면 변환, 이미 영문이면 그대로
+    return f"{R2_PUBLIC_URL}/{R2_BUCKET_PREFIX}/{folder}/{file_id}.jpg"
+
+
 def fix_url(url: str) -> str:
+    """한글 폴더명이 포함된 URL을 영문으로 수정"""
     decoded = unquote(url)
     for ko, en in STYLE_MAP.items():
         if f"/image/{ko}/" in decoded:
             return decoded.replace(f"/image/{ko}/", f"/image/{en}/")
-    return decoded  # 이미 영문이거나 매핑 없으면 그대로
-
-def fix_tasks_file(src: Path, dst: Path = None):
-    if dst is None:
-        dst = src
-    with open(src, encoding="utf-8") as f:
-        tasks = json.load(f)
-
-    changed = 0
-    for task in tasks:
-        old_url = task["data"]["image"]
-        new_url = fix_url(old_url)
-        if old_url != new_url:
-            task["data"]["image"] = new_url
-            changed += 1
-
-    with open(dst, "w", encoding="utf-8") as f:
-        json.dump(tasks, f, ensure_ascii=False, indent=2)
-
-    print(f"{src.name}: {changed}/{len(tasks)}개 URL 수정 → {dst.name}")
-
-if __name__ == "__main__":
-    project_dir = Path(__file__).parent
-    targets = list(project_dir.glob("tasks*.json"))
-    if not targets:
-        print("tasks*.json 파일이 없습니다.")
-    for p in targets:
-        fix_tasks_file(p)
+    return decoded

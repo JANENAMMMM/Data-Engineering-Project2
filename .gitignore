@@ -1,25 +1,14 @@
 # 가상환경
 .venv/
 
-# 원본 데이터 (대용량)
-labels/
-*.csv
+# 원본 데이터 (대용량 / gitignore)
+data/
 
-# 생성된 task 파일 (대용량)
-tasks*.json
-final\ task*.json
-final_task*.json
-additional_tasks.json
-tasks_with_caption.json
-json_index_cache.json
+# 생성된 output 파일
+output/
 
 # 민감 정보
 .env
-
-# 임시/디버그 파일
-debug_cache.py
-test.py
-tasks_test*.json
 
 # Python 캐시
 __pycache__/
@@ -28,3 +17,20 @@ __pycache__/
 
 # IDE
 .vscode/
+
+# 구 루트 레벨 데이터 파일 (이전 구조 잔재)
+labels/
+*.csv
+tasks*.json
+final\ task*.json
+final_task*.json
+additional_tasks.json
+tasks_with_caption.json
+json_index_cache.json
+tasks_test*.json
+
+# 가이드라인 PDF (proprietary)
+*.pdf
+
+# Jupyter 체크포인트
+.ipynb_checkpoints/
