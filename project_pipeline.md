@@ -45,7 +45,7 @@ VLM에 마스킹 이미지를 입력하면 모델·조명·겹옷 등 시각적 
 
 ---
 
-## Phase 3: VLM 캡셔닝 (Gemini 2.5 Flash)
+## Phase 3: VLM 캡셔닝 (Gemini 2.5 Flash Lite)
 
 ### VLM의 역할
 
@@ -79,6 +79,7 @@ Y2K, 뉴트로, 페미닌, 클래식, 스트리트, 이지웨어, 데일리룩, 
 ```
 
 - `데일리룩`과 `캐주얼`은 동의어로 취급. 동시 출현 금지 (BM25 IDF 희소성 유지).
+- 허용 태그풀 외 항목은 `_postprocess()`에서 자동 제거됨 (예: "스트릿" → "스트리트" 정규화 후 유지, "애슬레저룩" 제거).
 
 ### 배치 실행
 
@@ -87,18 +88,20 @@ from src.caption import batch_from_dir
 
 batch_from_dir(
     images_dir="data/masked_images_archive/masking_data (2)",
-    out_path="output/captions_full.jsonl",
+    out_path="output/captions_full_lite.jsonl",
     concurrency=50,
 )
 ```
 
-체크포인트 지원: 중단 후 재실행하면 완료된 항목을 자동 스킵.
+- 체크포인트 지원: 중단 후 재실행하면 완료된 항목을 자동 스킵.
+- **반드시 외부 터미널에서 실행** (Claude Code 내 실행 시 ~20분 후 강제 종료됨).
+- 모델 설정: `src/config.py`의 `GEMINI_MODEL` 확인.
 
 ---
 
 ## Phase 4: 캡션 출력 포맷 및 인덱스 문서 생성
 
-### 4-1. 캡션 출력 (output/captions_full.jsonl)
+### 4-1. 캡션 출력 (output/captions_full_lite.jsonl)
 
 배치 완료 후 JSONL 한 줄 = 이미지 1건.
 
@@ -270,7 +273,7 @@ Label Studio에서 수동 라벨링한 데이터로 FashionCLIP 엣지 클래스
 │       └── masking_data (2)/   # 폴리곤 마스킹 이미지 156,713장
 │                               # 파일명: {file_id}_{category}.jpg
 └── output/
-    └── captions_full.jsonl     # VLM 배치 출력 (인덱서 입력)
+    └── captions_full_lite.jsonl  # VLM 배치 출력 (인덱서 입력, Flash Lite 모델)
 ```
 
 ---
@@ -280,9 +283,9 @@ Label Studio에서 수동 라벨링한 데이터로 FashionCLIP 엣지 클래스
 ```
 data/masked_images_archive/masking_data (2)/*.jpg
     │
-    ▼  [Phase 3] batch_from_dir() — Gemini 2.5 Flash, concurrency=50
+    ▼  [Phase 3] batch_from_dir() — Gemini 2.5 Flash Lite, concurrency=50
     │
-output/captions_full.jsonl
+output/captions_full_lite.jsonl
     { file_id, category, caption_category, caption_micro_details, mood_and_tpo }
     │
     ├── JOIN ──▶ data/labels/.../{file_id}.json  (기존 구조화 레이블)

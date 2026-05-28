@@ -213,15 +213,67 @@ else:
 
 ---
 
-## 8. 최종 성능
+## 8. 배치 실행 중 발생한 운영 이슈
+
+### 이슈 1: Claude Code Bash 도구 timeout으로 프로세스 강제 종료
+배치를 Claude Code 내 백그라운드 Bash 도구로 실행했더니 약 20분 후 자동 종료됨.
+`timeout=600000`(10분) 파라미터가 백그라운드 프로세스에도 적용된 것이 원인.
+
+**해결**: 외부 PowerShell 터미널에서 직접 `python` 명령 실행. 체크포인트가 살아있어 이어서 처리됨.
+
+### 이슈 2: Gemini 2.5 Flash API 쿼터 소진
+concurrency=50, 14 req/s로 풀 가동하니 단시간에 RPM/일일 쿼터 소진.
+
+```
+429 RESOURCE_EXHAUSTED: 261건 (RPM 초과)
+429 "You exceeded your current quota": 7건 (하드 한도)
+```
+
+**해결**: Gemini 2.5 Flash Lite 모델로 전환. Lite는 쿼터 한도가 더 여유롭고 비용도 낮음.
+결과를 분리하기 위해 `output/captions_full_lite.jsonl`에 별도 저장.
+
+---
+
+## 9. Flash vs Flash Lite 품질 비교 (69,622건 기준)
+
+| 항목 | 2.5 Flash | 2.5 Flash Lite | 비고 |
+|---|---|---|---|
+| 데일리룩+캐주얼 중복 | 0% | 0% | postprocess로 방어 |
+| 태그풀 외 TPO | 0.0% | 1.0% | "스트릿" 647건 → 후처리로 수정 |
+| category 핏 prefix | 3.1% | 1.1% | Lite 우위 |
+| micro_details 빈 배열 | 28.2% | 16.5% | Lite가 더 많이 추출 |
+| micro_details 평균 길이 | 1.06개 | 1.32개 | Lite 우위 |
+| category 고유값 수 | 1,589종 | 3,111종 | Lite가 더 세분화 |
+
+**주요 발견**: Lite의 "스트릿" 오표기 647건 — 허용 태그 `스트리트`의 비표준 표기. BM25에서 검색 누락 발생.
+
+**대응**: `_postprocess()`에 두 가지 로직 추가:
+1. 표기 정규화 맵: `{"스트릿": "스트리트", ...}`
+2. 허용 태그풀 외 항목 전체 제거
+
+```python
+_TPO_NORMALIZE = {"스트릿": "스트리트"}
+_ALLOWED_TPO = {"하객룩", "오피스룩", ..., "데일리룩", "캐주얼"}
+
+tpo = [_TPO_NORMALIZE.get(t, t) for t in tpo]
+tpo = [t for t in tpo if t in _ALLOWED_TPO]
+```
+
+이미 저장된 `captions_full_lite.jsonl` 667건도 일괄 후처리 완료.
+
+**결론**: Lite는 Flash보다 품질이 약간 낮지만 후처리 후 검색 사용 가능 수준. 일부 지표는 오히려 Lite가 우위.
+
+---
+
+## 10. 최종 성능
 
 | 단계 | 동시성 | 속도 | 에러율 |
 |---|---|---|---|
 | 초기 테스트 (concurrency=15) | 15 | ~3.5 req/s | 0% |
-| 최종 (concurrency=50, Queue 패턴) | 50 | ~14 req/s | 0% |
+| concurrency=50, Queue 패턴 | 50 | ~14 req/s | 0% |
+| Flash Lite (외부 터미널) | 50 | 진행 중 | 낮음 |
 
-- 156,713건 예상 소요: **약 185분 (3.1시간)**
-- 출력 예상 용량: **약 29MB** (JSONL)
+- 출력 예상 용량: **약 29MB** (JSONL, 156k건 기준)
 - 체크포인트: 중단 후 재실행 시 완료분 자동 스킵
 
 ---
@@ -231,9 +283,9 @@ else:
 ```
 data/masked_images_archive/masking_data (2)/*.jpg
     ↓ batch_from_dir() — asyncio Queue, concurrency=50
-    ↓ Gemini 2.5 Flash (response_schema=CaptionOutput, thinking_budget=0)
-    ↓ _postprocess() — 데일리룩+캐주얼 중복 제거
-output/captions_full.jsonl
+    ↓ Gemini 2.5 Flash Lite (response_schema=CaptionOutput, thinking_budget=0)
+    ↓ _postprocess() — 태그풀 필터링 + 표기 정규화 + 데일리룩·캐주얼 중복 제거
+output/captions_full_lite.jsonl
     { file_id, category, caption_category, caption_micro_details, mood_and_tpo }
     ↓ (인덱서)
     ↓ build_dense_caption(vlm, existing) — E5 임베딩

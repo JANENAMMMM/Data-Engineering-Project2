@@ -28,7 +28,7 @@ from google.genai import types
 
 from src.config import GEMINI_API_KEY, GEMINI_MODEL
 
-CONCURRENCY = 15  # 동시 API 호출 수 (Gemini Flash ~2000 RPM 기준)
+CONCURRENCY = 70  # 동시 API 호출 수 (Gemini Flash ~2000 RPM 기준)
 
 _PROMPT_PATH = Path(__file__).parent.parent / "prompts" / "caption_system_prompt.txt"
 SYSTEM_PROMPT = _PROMPT_PATH.read_text(encoding="utf-8").strip()
@@ -193,9 +193,20 @@ def generate_caption_from_image(image: Image.Image, retries: int = 3) -> Caption
     return _call_gemini_sync(img_bytes, mime_type, retries)
 
 
+_TPO_NORMALIZE = {"스트릿": "스트리트", "streetwear": "스트리트"}
+_ALLOWED_TPO = {
+    "하객룩","오피스룩","데이트룩","피크닉룩","바캉스룩","페스티벌룩",
+    "등산룩","골프룩","리조트룩","웨딩게스트","미니멀룩","고프코어",
+    "Y2K","뉴트로","페미닌","클래식","스트리트","이지웨어","데일리룩","캐주얼",
+}
+
 def _postprocess(output: dict) -> CaptionOutput:
     """VLM 출력 후처리: 규칙 위반 보정."""
     tpo = output.get("mood_and_tpo") or []
+    # 표기 정규화 후 허용 태그풀 외 제거
+    tpo = [_TPO_NORMALIZE.get(t, t) for t in tpo]
+    tpo = [t for t in tpo if t in _ALLOWED_TPO]
+    # 데일리룩+캐주얼 동시 출현 금지
     if "데일리룩" in tpo and "캐주얼" in tpo:
         tpo = [t for t in tpo if t != "캐주얼"]
     output["mood_and_tpo"] = tpo
@@ -323,7 +334,8 @@ async def _process_image(
                 "error": str(e),
             }
             counters["err"] += 1
-            status = f"ERR"
+            err_short = str(e)[:80]
+            status = f"ERR [{err_short}]"
 
         async with write_lock:
             with open(out_path, "a", encoding="utf-8") as f:
@@ -334,8 +346,9 @@ async def _process_image(
         elapsed = time.time() - counters["start"]
         rps = counters["done"] / elapsed if elapsed > 0 else 0
         eta = (total - counters["done"]) / rps if rps > 0 else 0
+        ts = time.strftime("%H:%M:%S")
         print(
-            f"[{counters['done']:>6}/{total}] {status}  {img_path.name:<35} "
+            f"[{ts}] [{counters['done']:>6}/{total}] {status}  {img_path.name:<35} "
             f"err={counters['err']}  {rps:.1f}req/s  ETA={eta/60:.1f}min"
         )
 
