@@ -13,7 +13,7 @@ R2_BUCKET_PREFIX  = "image"
 
 # Gemini
 GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
-GEMINI_MODEL   = "gemini-2.5-flash"
+GEMINI_MODEL   = "gemini-2.5-flash-lite"  # 또는 "gemini-2.5-flash" 등 원하는 모델로 변경 가능
 
 # Label Studio
 LS_URL        = os.environ["LS_URL"]
