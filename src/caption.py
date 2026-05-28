@@ -244,22 +244,24 @@ async def _call_gemini_async(
     client = _get_client()
     for attempt in range(retries):
         try:
-            response = await client.aio.models.generate_content(
-                model=GEMINI_MODEL,
-                contents=[
-                    types.Part.from_bytes(data=img_bytes, mime_type=mime_type),
-                    SYSTEM_PROMPT,
-                ],
-                config=_make_config(),
+            response = await asyncio.wait_for(
+                client.aio.models.generate_content(
+                    model=GEMINI_MODEL,
+                    contents=[
+                        types.Part.from_bytes(data=img_bytes, mime_type=mime_type),
+                        SYSTEM_PROMPT,
+                    ],
+                    config=_make_config(),
+                ),
+                timeout=120,
             )
             return _postprocess(json.loads(response.text))
         except Exception as e:
             err_str = str(e)
-            if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-                wait = _parse_retry_delay(err_str)
+            is_rate_limit = "429" in err_str or "RESOURCE_EXHAUSTED" in err_str
+            if attempt < retries - 1:
+                wait = _parse_retry_delay(err_str) if is_rate_limit else 2 ** attempt
                 await asyncio.sleep(wait)
-            elif attempt < retries - 1:
-                await asyncio.sleep(2 ** attempt)
             else:
                 raise
 
@@ -280,6 +282,137 @@ def _local_image_path(task: dict, masked_dir: Path | None) -> Path | None:
         return None
     p = masked_dir / f"{file_id}_{suffix}.jpg"
     return p if p.exists() else None
+
+
+# ── 이미지 디렉토리 직접 배치 처리 ──────────────────────────────────────────
+
+async def _process_image(
+    img_path: Path,
+    sem: asyncio.Semaphore,
+    out_path: Path,
+    counters: dict,
+    write_lock: asyncio.Lock,
+) -> None:
+    # 파일명: {file_id}_{category}.jpg
+    stem = img_path.stem
+    parts = stem.rsplit("_", 1)
+    file_id = parts[0]
+    category = parts[1] if len(parts) == 2 else ""
+
+    async with sem:
+        try:
+            img_bytes = await asyncio.to_thread(img_path.read_bytes)
+            vlm = await _call_gemini_async(img_bytes, "image/jpeg")
+
+            row = {
+                "file_id": file_id,
+                "category": category,
+                "caption_category":      vlm.get("category", ""),
+                "caption_micro_details": vlm.get("micro_details", []),
+                "mood_and_tpo":          vlm.get("mood_and_tpo", []),
+            }
+            counters["ok"] += 1
+            status = "OK "
+        except Exception as e:
+            row = {
+                "file_id": file_id,
+                "category": category,
+                "caption_category": "",
+                "caption_micro_details": [],
+                "mood_and_tpo": [],
+                "error": str(e),
+            }
+            counters["err"] += 1
+            status = f"ERR"
+
+        async with write_lock:
+            with open(out_path, "a", encoding="utf-8") as f:
+                f.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+        counters["done"] += 1
+        total = counters["total"]
+        elapsed = time.time() - counters["start"]
+        rps = counters["done"] / elapsed if elapsed > 0 else 0
+        eta = (total - counters["done"]) / rps if rps > 0 else 0
+        print(
+            f"[{counters['done']:>6}/{total}] {status}  {img_path.name:<35} "
+            f"err={counters['err']}  {rps:.1f}req/s  ETA={eta/60:.1f}min"
+        )
+
+
+async def batch_from_dir_async(
+    images_dir: str,
+    out_path: str,
+    limit: int | None = None,
+    concurrency: int = CONCURRENCY,
+) -> None:
+    """
+    masked images 디렉토리 → 비동기 병렬 캡션 생성 → JSONL 저장.
+    task JSON 불필요. 파일명 {file_id}_{category}.jpg 에서 메타데이터 추출.
+    체크포인트: out_path가 이미 존재하면 완료된 (file_id, category) 쌍을 스킵.
+    """
+    all_images = sorted(Path(images_dir).glob("*.jpg"))
+    if limit:
+        all_images = all_images[:limit]
+
+    out_p = Path(out_path)
+    done_keys: set[tuple] = set()
+    if out_p.exists():
+        with open(out_p, encoding="utf-8") as f:
+            for line in f:
+                try:
+                    r = json.loads(line)
+                    if not r.get("error"):  # 성공한 것만 스킵
+                        done_keys.add((r["file_id"], r["category"]))
+                except Exception:
+                    pass
+        if done_keys:
+            print(f"체크포인트 감지: {len(done_keys)}개 완료, 이어서 처리")
+
+    def _key(p: Path):
+        parts = p.stem.rsplit("_", 1)
+        return (parts[0], parts[1] if len(parts) == 2 else "")
+
+    remaining = [p for p in all_images if _key(p) not in done_keys]
+
+    if not remaining:
+        print("모두 완료됨.")
+        return
+
+    print(f"처리 대상: {len(remaining)}개 / 전체 {len(all_images)}개  (동시성: {concurrency})")
+    out_p.parent.mkdir(parents=True, exist_ok=True)
+
+    queue      = asyncio.Queue()
+    write_lock = asyncio.Lock()
+    sem        = asyncio.Semaphore(concurrency)
+    counters   = {"ok": 0, "err": 0, "done": 0, "total": len(remaining), "start": time.time()}
+
+    for p in remaining:
+        queue.put_nowait(p)
+
+    async def worker():
+        while True:
+            try:
+                img_path = queue.get_nowait()
+            except asyncio.QueueEmpty:
+                return
+            await _process_image(img_path, sem, out_p, counters, write_lock)
+
+    await asyncio.gather(*[worker() for _ in range(concurrency)])
+
+    elapsed = time.time() - counters["start"]
+    print(f"\n완료: {counters['ok']}개 성공, {counters['err']}개 실패  ({elapsed/60:.1f}분)")
+    print(f"→ {out_path}")
+
+
+def batch_from_dir(
+    images_dir: str,
+    out_path: str,
+    limit: int | None = None,
+    concurrency: int = CONCURRENCY,
+) -> None:
+    """batch_from_dir_async의 동기 진입점."""
+    asyncio.run(batch_from_dir_async(images_dir, out_path, limit=limit, concurrency=concurrency))
 
 
 async def _process_task(
