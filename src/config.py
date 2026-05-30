@@ -20,5 +20,9 @@ LS_URL        = os.environ["LS_URL"]
 LS_API_TOKEN  = os.environ["LS_API_TOKEN"]
 LS_PROJECT_ID = int(os.environ["LS_PROJECT_ID"])
 
+# Turso / SQLite (optional)
+DB_URL = os.environ.get("DB_URL")
+DB_ACCESS_TOKEN = os.environ.get("DB_ACCESS_TOKEN")
+
 # 도메인 상수
 CLOTHING_TYPES = ['상의', '하의', '아우터', '원피스']
