@@ -3,6 +3,11 @@
 
 # 원본 데이터 (대용량 / gitignore)
 data/
+K_fashion 이미지 sample/
+test_data/
+
+# 모델
+models/
 
 # 생성된 output 파일
 output/

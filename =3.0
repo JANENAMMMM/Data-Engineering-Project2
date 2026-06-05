@@ -1,0 +1,338 @@
+Collecting prefect
+  Downloading prefect-3.7.3-py3-none-any.whl (15.0 MB)
+     ---------------------------------------- 15.0/15.0 MB 2.6 MB/s eta 0:00:00
+Collecting qdrant-client
+  Downloading qdrant_client-1.18.0-py3-none-any.whl (398 kB)
+     -------------------------------------- 398.1/398.1 kB 2.8 MB/s eta 0:00:00
+Collecting torch
+  Downloading torch-2.12.0-cp310-cp310-win_amd64.whl (122.9 MB)
+     -------------------------------------- 122.9/122.9 MB 4.7 MB/s eta 0:00:00
+Collecting torchvision
+  Downloading torchvision-0.27.0-cp310-cp310-win_amd64.whl (3.4 MB)
+     ---------------------------------------- 3.4/3.4 MB 4.6 MB/s eta 0:00:00
+Collecting open-clip-torch
+  Downloading open_clip_torch-3.3.0-py3-none-any.whl (1.5 MB)
+     ---------------------------------------- 1.5/1.5 MB 3.7 MB/s eta 0:00:00
+Collecting rembg
+  Downloading rembg-2.0.69-py3-none-any.whl (43 kB)
+     ---------------------------------------- 43.7/43.7 kB 2.1 MB/s eta 0:00:00
+Collecting gradio>=4.0
+  Downloading gradio-6.16.0-py3-none-any.whl (20.1 MB)
+     ---------------------------------------- 20.1/20.1 MB 3.3 MB/s eta 0:00:00
+Collecting dateparser<2.0.0,>=1.1.1
+  Downloading dateparser-1.4.0-py3-none-any.whl (300 kB)
+     -------------------------------------- 300.4/300.4 kB 3.7 MB/s eta 0:00:00
+Collecting pendulum<4,>=3.1.0
+  Downloading pendulum-3.2.0-cp310-cp310-win_amd64.whl (260 kB)
+     -------------------------------------- 260.7/260.7 kB 5.3 MB/s eta 0:00:00
+Collecting readchar<5.0.0,>=4.0.0
+  Downloading readchar-4.2.2-py3-none-any.whl (9.4 kB)
+Collecting opentelemetry-api<2.0.0,>=1.27.0
+  Downloading opentelemetry_api-1.42.1-py3-none-any.whl (61 kB)
+     ---------------------------------------- 61.3/61.3 kB 3.2 MB/s eta 0:00:00
+Requirement already satisfied: typing-extensions<5.0.0,>=4.10.0 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from prefect) (4.15.0)
+Collecting click<9,>=8.0
+  Downloading click-8.4.1-py3-none-any.whl (116 kB)
+     -------------------------------------- 116.6/116.6 kB 3.4 MB/s eta 0:00:00
+Requirement already satisfied: exceptiongroup>=1.0.0 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from prefect) (1.3.1)
+Collecting pyyaml<7.0.0,>=5.4.1
+  Using cached pyyaml-6.0.3-cp310-cp310-win_amd64.whl (158 kB)
+Collecting pydantic-extra-types<3.0.0,>=2.8.2
+  Using cached pydantic_extra_types-2.11.1-py3-none-any.whl (79 kB)
+Collecting fsspec>=2022.5.0
+  Using cached fsspec-2026.4.0-py3-none-any.whl (203 kB)
+Collecting jsonpatch<2.0,>=1.32
+  Downloading jsonpatch-1.33-py2.py3-none-any.whl (12 kB)
+Collecting cachetools<8.0,>=5.3
+  Downloading cachetools-7.1.4-py3-none-any.whl (16 kB)
+Collecting asgi-lifespan<3.0,>=1.0
+  Downloading asgi_lifespan-2.1.0-py3-none-any.whl (10 kB)
+Collecting coolname<6.0.0,>=1.0.4
+  Downloading coolname-5.0.0-py3-none-any.whl (47 kB)
+     ---------------------------------------- 47.4/47.4 kB 2.3 MB/s eta 0:00:00
+Collecting docker<8.0,>=4.0
+  Downloading docker-7.1.0-py3-none-any.whl (147 kB)
+     -------------------------------------- 147.8/147.8 kB 4.4 MB/s eta 0:00:00
+Collecting aiosqlite<1.0.0,>=0.17.0
+  Downloading aiosqlite-0.22.1-py3-none-any.whl (17 kB)
+Collecting graphviz>=0.20.1
+  Downloading graphviz-0.21-py3-none-any.whl (47 kB)
+     ---------------------------------------- 47.3/47.3 kB 1.2 MB/s eta 0:00:00
+Collecting humanize<5.0.0,>=4.9.0
+  Downloading humanize-4.15.0-py3-none-any.whl (132 kB)
+     -------------------------------------- 132.2/132.2 kB 1.9 MB/s eta 0:00:00
+Collecting cloudpickle<4.0,>=2.0
+  Downloading cloudpickle-3.1.2-py3-none-any.whl (22 kB)
+Collecting packaging<26.3,>=21.3
+  Using cached packaging-26.2-py3-none-any.whl (100 kB)
+Collecting pydantic-settings<3.0.0,>=2.9.1
+  Using cached pydantic_settings-2.14.1-py3-none-any.whl (60 kB)
+Collecting prometheus-client>=0.20.0
+  Using cached prometheus_client-0.25.0-py3-none-any.whl (64 kB)
+Collecting griffe<3.0.0,>=0.49.0
+  Downloading griffe-2.0.2-py3-none-any.whl (5.1 kB)
+Collecting jinja2<4.0.0,>=3.1.6
+  Using cached jinja2-3.1.6-py3-none-any.whl (134 kB)
+Requirement already satisfied: pydantic!=2.11.0,!=2.11.1,!=2.11.2,!=2.11.3,!=2.11.4,<3.0.0,>=2.10.1 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from prefect) (2.13.4)
+Collecting cyclopts>=4.8.0
+  Downloading cyclopts-4.16.1-py3-none-any.whl (219 kB)
+     -------------------------------------- 219.0/219.0 kB 3.3 MB/s eta 0:00:00
+Requirement already satisfied: sniffio<2.0.0,>=1.3.0 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from prefect) (1.3.1)
+Collecting orjson<4.0,>=3.7
+  Downloading orjson-3.11.9-cp310-cp310-win_amd64.whl (127 kB)
+     -------------------------------------- 127.3/127.3 kB 2.5 MB/s eta 0:00:00
+Collecting amplitude-analytics<2.0.0,>=1.2.1
+  Downloading amplitude_analytics-1.2.3-py3-none-any.whl (24 kB)
+Collecting rfc3339-validator<0.2.0,>=0.1.4
+  Using cached rfc3339_validator-0.1.4-py2.py3-none-any.whl (3.5 kB)
+Requirement already satisfied: websockets<17.0,>=15.0.1 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from prefect) (16.0)
+Collecting jsonschema<5.0.0,>=4.18.0
+  Using cached jsonschema-4.26.0-py3-none-any.whl (90 kB)
+Collecting jinja2-humanize-extension>=0.4.0
+  Downloading jinja2_humanize_extension-0.4.0-py3-none-any.whl (4.8 kB)
+Collecting pluggy>=1.6.0
+  Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+Requirement already satisfied: pytz<2027,>=2021.1 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from prefect) (2026.2)
+Requirement already satisfied: httpcore<2.0.0,>=1.0.5 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from prefect) (1.0.9)
+Collecting sqlalchemy[asyncio]<3.0.0,>=2.0
+  Downloading sqlalchemy-2.0.50-cp310-cp310-win_amd64.whl (2.1 MB)
+     ---------------------------------------- 2.1/2.1 MB 2.0 MB/s eta 0:00:00
+Collecting starlette>=1.0.1
+  Downloading starlette-1.2.1-py3-none-any.whl (73 kB)
+     ---------------------------------------- 73.3/73.3 kB 1.0 MB/s eta 0:00:00
+Collecting uvicorn!=0.29.0,>=0.14.0
+  Downloading uvicorn-0.49.0-py3-none-any.whl (71 kB)
+     -------------------------------------- 71.4/71.4 kB 986.1 kB/s eta 0:00:00
+Requirement already satisfied: cryptography>=36.0.1 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from prefect) (48.0.0)
+Collecting pydocket>=0.19.0
+  Downloading pydocket-0.21.1-py3-none-any.whl (117 kB)
+     -------------------------------------- 117.2/117.2 kB 1.4 MB/s eta 0:00:00
+Requirement already satisfied: python-dateutil<3.0.0,>=2.8.2 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from prefect) (2.9.0.post0)
+Collecting asyncpg<1.0.0,>=0.23
+  Downloading asyncpg-0.31.0-cp310-cp310-win_amd64.whl (581 kB)
+     -------------------------------------- 581.6/581.6 kB 2.6 MB/s eta 0:00:00
+Collecting alembic<2.0.0,>=1.7.5
+  Downloading alembic-1.18.4-py3-none-any.whl (263 kB)
+     -------------------------------------- 263.9/263.9 kB 1.6 MB/s eta 0:00:00
+Collecting pathspec>=0.8.0
+  Using cached pathspec-1.1.1-py3-none-any.whl (57 kB)
+Requirement already satisfied: httpx[http2]!=0.23.2,>=0.23 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from prefect) (0.28.1)
+Collecting fastapi<1.0.0,>=0.111.0
+  Downloading fastapi-0.136.3-py3-none-any.whl (117 kB)
+     -------------------------------------- 117.5/117.5 kB 3.5 MB/s eta 0:00:00
+Collecting apprise<2.0.0,>=1.1.0
+  Downloading apprise-1.11.0-py3-none-any.whl (1.7 MB)
+     ---------------------------------------- 1.7/1.7 MB 2.8 MB/s eta 0:00:00
+Collecting ruamel-yaml>=0.17.0
+  Downloading ruamel_yaml-0.19.1-py3-none-any.whl (118 kB)
+     -------------------------------------- 118.1/118.1 kB 1.4 MB/s eta 0:00:00
+Collecting toml>=0.10.0
+  Downloading toml-0.10.2-py2.py3-none-any.whl (16 kB)
+Collecting ruamel-yaml-clib>=0.2.8
+  Downloading ruamel_yaml_clib-0.2.15-cp310-cp310-win_amd64.whl (121 kB)
+     -------------------------------------- 121.9/121.9 kB 1.8 MB/s eta 0:00:00
+Collecting semver>=3.0.4
+  Downloading semver-3.0.4-py3-none-any.whl (17 kB)
+Requirement already satisfied: pydantic-core<3.0.0,>=2.12.0 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from prefect) (2.46.4)
+Collecting python-slugify<9.0,>=5.0
+  Downloading python_slugify-8.0.4-py2.py3-none-any.whl (10 kB)
+Requirement already satisfied: anyio<5.0.0,>=4.4.0 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from prefect) (4.13.0)
+Collecting rich<16.0,>=11.0
+  Using cached rich-15.0.0-py3-none-any.whl (310 kB)
+Requirement already satisfied: urllib3<3,>=1.26.14 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from qdrant-client) (2.7.0)
+Requirement already satisfied: numpy<2.3.0,>=1.21 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from qdrant-client) (2.2.6)
+Collecting portalocker<4.0,>=2.7.0
+  Downloading portalocker-3.2.0-py3-none-any.whl (22 kB)
+Collecting protobuf>=3.20.0
+  Downloading protobuf-7.35.0-cp310-abi3-win_amd64.whl (439 kB)
+     -------------------------------------- 440.0/440.0 kB 2.7 MB/s eta 0:00:00
+Collecting grpcio>=1.41.0
+  Downloading grpcio-1.81.0-cp310-cp310-win_amd64.whl (4.9 MB)
+     ---------------------------------------- 4.9/4.9 MB 3.0 MB/s eta 0:00:00
+Collecting sympy>=1.13.3
+  Using cached sympy-1.14.0-py3-none-any.whl (6.3 MB)
+Collecting filelock
+  Downloading filelock-3.29.1-py3-none-any.whl (40 kB)
+     -------------------------------------- 40.8/40.8 kB 391.2 kB/s eta 0:00:00
+Requirement already satisfied: setuptools<82 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from torch) (63.2.0)
+Collecting networkx>=2.5.1
+  Using cached networkx-3.4.2-py3-none-any.whl (1.7 MB)
+Requirement already satisfied: pillow!=8.3.*,>=5.3.0 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from torchvision) (12.2.0)
+Collecting regex
+  Using cached regex-2026.5.9-cp310-cp310-win_amd64.whl (278 kB)
+Collecting ftfy
+  Downloading ftfy-6.3.1-py3-none-any.whl (44 kB)
+     -------------------------------------- 44.8/44.8 kB 276.6 kB/s eta 0:00:00
+Collecting huggingface-hub
+  Downloading huggingface_hub-1.18.0-py3-none-any.whl (684 kB)
+     -------------------------------------- 684.4/684.4 kB 1.2 MB/s eta 0:00:00
+Collecting safetensors
+  Using cached safetensors-0.7.0-cp38-abi3-win_amd64.whl (341 kB)
+Requirement already satisfied: tqdm in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from open-clip-torch) (4.67.3)
+Collecting timm>=1.0.17
+  Downloading timm-1.0.27-py3-none-any.whl (2.6 MB)
+     ---------------------------------------- 2.6/2.6 MB 1.9 MB/s eta 0:00:00
+Collecting scipy
+  Using cached scipy-1.15.3-cp310-cp310-win_amd64.whl (41.3 MB)
+Collecting pooch
+  Downloading pooch-1.9.0-py3-none-any.whl (67 kB)
+     ---------------------------------------- 67.2/67.2 kB 3.6 MB/s eta 0:00:00
+Collecting opencv-python-headless
+  Using cached opencv_python_headless-4.13.0.92-cp37-abi3-win_amd64.whl (40.1 MB)
+Collecting scikit-image
+  Downloading scikit_image-0.25.2-cp310-cp310-win_amd64.whl (12.8 MB)
+     ---------------------------------------- 12.8/12.8 MB 4.5 MB/s eta 0:00:00
+Collecting pymatting
+  Downloading pymatting-1.1.15-py3-none-any.whl (54 kB)
+     -------------------------------------- 54.9/54.9 kB 719.7 kB/s eta 0:00:00
+Collecting python-multipart<1.0,>=0.0.18
+  Downloading python_multipart-0.0.32-py3-none-any.whl (30 kB)
+Collecting pydub<1.0
+  Downloading pydub-0.25.1-py2.py3-none-any.whl (32 kB)
+Collecting semantic-version~=2.0
+  Downloading semantic_version-2.10.0-py2.py3-none-any.whl (15 kB)
+Collecting groovy~=0.1
+  Downloading groovy-0.1.2-py3-none-any.whl (14 kB)
+Requirement already satisfied: pandas<4.0,>=1.0 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from gradio>=4.0) (2.3.3)
+Collecting tomlkit<0.15.0,>=0.12.0
+  Downloading tomlkit-0.14.0-py3-none-any.whl (39 kB)
+Collecting gradio-client==2.5.0
+  Downloading gradio_client-2.5.0-py3-none-any.whl (59 kB)
+     ---------------------------------------- 60.0/60.0 kB 3.1 MB/s eta 0:00:00
+Collecting markupsafe<4.0,>=2.0
+  Using cached markupsafe-3.0.3-cp310-cp310-win_amd64.whl (15 kB)
+Collecting safehttpx<0.2.0,>=0.1.7
+  Downloading safehttpx-0.1.7-py3-none-any.whl (9.0 kB)
+Collecting typer<1.0,>=0.12
+  Downloading typer-0.26.7-py3-none-any.whl (122 kB)
+     -------------------------------------- 122.5/122.5 kB 3.5 MB/s eta 0:00:00
+Collecting brotli>=1.1.0
+  Downloading brotli-1.2.0-cp310-cp310-win_amd64.whl (369 kB)
+     -------------------------------------- 369.0/369.0 kB 1.0 MB/s eta 0:00:00
+Collecting hf-gradio<1.0,>=0.4.1
+  Downloading hf_gradio-0.4.1-py3-none-any.whl (4.5 kB)
+Collecting tomli
+  Using cached tomli-2.4.1-py3-none-any.whl (14 kB)
+Collecting Mako
+  Downloading mako-1.3.12-py3-none-any.whl (78 kB)
+     -------------------------------------- 78.5/78.5 kB 726.4 kB/s eta 0:00:00
+Requirement already satisfied: idna>=2.8 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from anyio<5.0.0,>=4.4.0->prefect) (3.16)
+Requirement already satisfied: certifi in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from apprise<2.0.0,>=1.1.0->prefect) (2026.5.20)
+Collecting markdown
+  Downloading markdown-3.10.2-py3-none-any.whl (108 kB)
+     ------------------------------------ 108.2/108.2 kB 694.6 kB/s eta 0:00:00
+Requirement already satisfied: requests in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from apprise<2.0.0,>=1.1.0->prefect) (2.34.2)
+Collecting requests-oauthlib
+  Downloading requests_oauthlib-2.0.0-py2.py3-none-any.whl (24 kB)
+Requirement already satisfied: tzdata in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from apprise<2.0.0,>=1.1.0->prefect) (2026.2)
+Collecting async_timeout>=4.0.3
+  Downloading async_timeout-5.0.1-py3-none-any.whl (6.2 kB)
+Requirement already satisfied: colorama in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from click<9,>=8.0->prefect) (0.4.6)
+Requirement already satisfied: cffi>=2.0.0 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from cryptography>=36.0.1->prefect) (2.0.0)
+Collecting docstring-parser<4.0,>=0.15
+  Downloading docstring_parser-0.18.0-py3-none-any.whl (22 kB)
+Collecting rich-rst<3.0.0,>=1.3.1
+  Downloading rich_rst-2.0.1-py3-none-any.whl (272 kB)
+     -------------------------------------- 272.9/272.9 kB 1.7 MB/s eta 0:00:00
+Collecting attrs>=23.1.0
+  Using cached attrs-26.1.0-py3-none-any.whl (67 kB)
+Collecting tzlocal>=0.2
+  Downloading tzlocal-5.3.1-py3-none-any.whl (18 kB)
+Collecting pywin32>=304
+  Downloading pywin32-312-cp310-cp310-win_amd64.whl (6.9 MB)
+     ---------------------------------------- 6.9/6.9 MB 1.7 MB/s eta 0:00:00
+Requirement already satisfied: typing-inspection>=0.4.2 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from fastapi<1.0.0,>=0.111.0->prefect) (0.4.2)
+Collecting annotated-doc>=0.0.2
+  Using cached annotated_doc-0.0.4-py3-none-any.whl (5.3 kB)
+Collecting griffecli==2.0.2
+  Downloading griffecli-2.0.2-py3-none-any.whl (9.5 kB)
+Collecting griffelib==2.0.2
+  Downloading griffelib-2.0.2-py3-none-any.whl (142 kB)
+     ------------------------------------ 142.4/142.4 kB 772.6 kB/s eta 0:00:00
+Requirement already satisfied: h11>=0.16 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from httpcore<2.0.0,>=1.0.5->prefect) (0.16.0)
+Collecting h2<5,>=3
+  Downloading h2-4.3.0-py3-none-any.whl (61 kB)
+     ---------------------------------------- 61.8/61.8 kB 1.1 MB/s eta 0:00:00
+Collecting typer<1.0,>=0.12
+  Using cached typer-0.25.1-py3-none-any.whl (58 kB)
+Collecting hf-xet<2.0.0,>=1.4.3
+  Using cached hf_xet-1.5.0-cp37-abi3-win_amd64.whl (4.0 MB)
+Collecting jsonpointer>=1.9
+  Using cached jsonpointer-3.1.1-py3-none-any.whl (7.7 kB)
+Collecting referencing>=0.28.4
+  Using cached referencing-0.37.0-py3-none-any.whl (26 kB)
+Collecting jsonschema-specifications>=2023.03.6
+  Using cached jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+Collecting rpds-py>=0.25.0
+  Using cached rpds_py-0.30.0-cp310-cp310-win_amd64.whl (235 kB)
+Requirement already satisfied: annotated-types>=0.6.0 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from pydantic!=2.11.0,!=2.11.1,!=2.11.2,!=2.11.3,!=2.11.4,<3.0.0,>=2.10.1->prefect) (0.7.0)
+Requirement already satisfied: python-dotenv>=0.21.0 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from pydantic-settings<3.0.0,>=2.9.1->prefect) (1.2.2)
+Collecting py-key-value-aio[memory,redis]>=0.3.0
+  Downloading py_key_value_aio-0.4.5-py3-none-any.whl (170 kB)
+     -------------------------------------- 170.0/170.0 kB 2.0 MB/s eta 0:00:00
+Collecting redis>=5
+  Downloading redis-8.0.0-py3-none-any.whl (499 kB)
+     ------------------------------------ 499.9/499.9 kB 696.5 kB/s eta 0:00:00
+Collecting burner-redis>=0.1.7
+  Downloading burner_redis-0.1.7-cp310-abi3-win_amd64.whl (1.1 MB)
+     ---------------------------------------- 1.1/1.1 MB 3.0 MB/s eta 0:00:00
+Collecting cronsim>=2.6
+  Downloading cronsim-2.7-py3-none-any.whl (14 kB)
+Collecting uncalled-for>=0.3.2
+  Downloading uncalled_for-0.3.2-py3-none-any.whl (11 kB)
+Collecting taskgroup>=0.2.2
+  Downloading taskgroup-0.2.2-py2.py3-none-any.whl (14 kB)
+Collecting python-json-logger>=2.0.7
+  Using cached python_json_logger-4.1.0-py3-none-any.whl (15 kB)
+Requirement already satisfied: six>=1.5 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from python-dateutil<3.0.0,>=2.8.2->prefect) (1.17.0)
+Collecting text-unidecode>=1.3
+  Downloading text_unidecode-1.3-py2.py3-none-any.whl (78 kB)
+     ---------------------------------------- 78.2/78.2 kB 2.1 MB/s eta 0:00:00
+Collecting pygments<3.0.0,>=2.13.0
+  Using cached pygments-2.20.0-py3-none-any.whl (1.2 MB)
+Collecting markdown-it-py>=2.2.0
+  Using cached markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+Collecting greenlet>=1
+  Downloading greenlet-3.5.1-cp310-cp310-win_amd64.whl (237 kB)
+     ------------------------------------ 237.8/237.8 kB 809.7 kB/s eta 0:00:00
+Collecting mpmath<1.4,>=1.1.0
+  Using cached mpmath-1.3.0-py3-none-any.whl (536 kB)
+Collecting shellingham>=1.3.0
+  Using cached shellingham-1.5.4-py2.py3-none-any.whl (9.8 kB)
+Collecting wcwidth
+  Using cached wcwidth-0.7.0-py3-none-any.whl (110 kB)
+Collecting platformdirs>=2.5.0
+  Using cached platformdirs-4.10.0-py3-none-any.whl (22 kB)
+Collecting numba>=0.60.0
+  Downloading numba-0.65.1-cp310-cp310-win_amd64.whl (2.7 MB)
+     ---------------------------------------- 2.7/2.7 MB 3.2 MB/s eta 0:00:00
+Collecting imageio!=2.35.0,>=2.33
+  Downloading imageio-2.37.3-py3-none-any.whl (317 kB)
+     -------------------------------------- 317.6/317.6 kB 2.8 MB/s eta 0:00:00
+Collecting tifffile>=2022.8.12
+  Downloading tifffile-2025.5.10-py3-none-any.whl (226 kB)
+     -------------------------------------- 226.5/226.5 kB 1.5 MB/s eta 0:00:00
+Collecting lazy-loader>=0.4
+  Downloading lazy_loader-0.5-py3-none-any.whl (8.0 kB)
+Requirement already satisfied: pycparser in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from cffi>=2.0.0->cryptography>=36.0.1->prefect) (3.0)
+Collecting hyperframe<7,>=6.1
+  Downloading hyperframe-6.1.0-py3-none-any.whl (13 kB)
+Collecting hpack<5,>=4.1
+  Downloading hpack-4.1.0-py3-none-any.whl (34 kB)
+Collecting mdurl~=0.1
+  Using cached mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+Collecting llvmlite<0.48,>=0.47.0dev0
+  Downloading llvmlite-0.47.0-cp310-cp310-win_amd64.whl (38.1 MB)
+     ---------------------------------------- 38.1/38.1 MB 3.8 MB/s eta 0:00:00
+Collecting beartype>=0.20.0
+  Downloading beartype-0.22.9-py3-none-any.whl (1.3 MB)
+     ---------------------------------------- 1.3/1.3 MB 3.5 MB/s eta 0:00:00
+Requirement already satisfied: charset_normalizer<4,>=2 in c:\users\janen\documents\26-1 ewha\데이터엔지니어링\project 2\label studio project\.venv\lib\site-packages (from requests->apprise<2.0.0,>=1.1.0->prefect) (3.4.7)
+Collecting oauthlib>=3.0.0
+  Downloading oauthlib-3.3.1-py3-none-any.whl (160 kB)
+     ------------------------------------ 160.1/160.1 kB 954.3 kB/s eta 0:00:00
+Installing collected packages: text-unidecode, pydub, mpmath, brotli, wcwidth, uncalled-for, tzlocal, tomlkit, tomli, toml, tifffile, sympy, shellingham, semver, semantic-version, scipy, safetensors, ruamel-yaml-clib, ruamel-yaml, rpds-py, rfc3339-validator, regex, readchar, pyyaml, pywin32, python-slugify, python-multipart, python-json-logger, pygments, protobuf, prometheus-client, pluggy, platformdirs, pathspec, packaging, orjson, opentelemetry-api, opencv-python-headless, oauthlib, networkx, mdurl, markupsafe, markdown, llvmlite, jsonpointer, imageio, hyperframe, humanize, hpack, hf-xet, grpcio, groovy, griffelib, greenlet, graphviz, fsspec, filelock, docstring-parser, cronsim, coolname, cloudpickle, click, cachetools, burner-redis, beartype, attrs, async_timeout, asgi-lifespan, annotated-doc, amplitude-analytics, aiosqlite, uvicorn, taskgroup, sqlalchemy, requests-oauthlib, referencing, redis, py-key-value-aio, portalocker, pooch, pendulum, numba, markdown-it-py, Mako, lazy-loader, jsonpatch, jinja2, h2, griffecli, ftfy, docker, dateparser, asyncpg, torch, starlette, scikit-image, rich, pymatting, pydantic-settings, pydantic-extra-types, jsonschema-specifications, jinja2-humanize-extension, griffe, apprise, alembic, typer, torchvision, safehttpx, rich-rst, jsonschema, fastapi, rembg, qdrant-client, pydocket, huggingface-hub, cyclopts, timm, prefect, gradio-client, open-clip-torch, hf-gradio, gradio
+Successfully installed Mako-1.3.12 aiosqlite-0.22.1 alembic-1.18.4 amplitude-analytics-1.2.3 annotated-doc-0.0.4 apprise-1.11.0 asgi-lifespan-2.1.0 async_timeout-5.0.1 asyncpg-0.31.0 attrs-26.1.0 beartype-0.22.9 brotli-1.2.0 burner-redis-0.1.7 cachetools-7.1.4 click-8.4.1 cloudpickle-3.1.2 coolname-5.0.0 cronsim-2.7 cyclopts-4.16.1 dateparser-1.4.0 docker-7.1.0 docstring-parser-0.18.0 fastapi-0.136.3 filelock-3.29.1 fsspec-2026.4.0 ftfy-6.3.1 gradio-6.16.0 gradio-client-2.5.0 graphviz-0.21 greenlet-3.5.1 griffe-2.0.2 griffecli-2.0.2 griffelib-2.0.2 groovy-0.1.2 grpcio-1.81.0 h2-4.3.0 hf-gradio-0.4.1 hf-xet-1.5.0 hpack-4.1.0 huggingface-hub-1.18.0 humanize-4.15.0 hyperframe-6.1.0 imageio-2.37.3 jinja2-3.1.6 jinja2-humanize-extension-0.4.0 jsonpatch-1.33 jsonpointer-3.1.1 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 lazy-loader-0.5 llvmlite-0.47.0 markdown-3.10.2 markdown-it-py-4.2.0 markupsafe-3.0.3 mdurl-0.1.2 mpmath-1.3.0 networkx-3.4.2 numba-0.65.1 oauthlib-3.3.1 open-clip-torch-3.3.0 opencv-python-headless-4.13.0.92 opentelemetry-api-1.42.1 orjson-3.11.9 packaging-26.2 pathspec-1.1.1 pendulum-3.2.0 platformdirs-4.10.0 pluggy-1.6.0 pooch-1.9.0 portalocker-3.2.0 prefect-3.7.3 prometheus-client-0.25.0 protobuf-7.35.0 py-key-value-aio-0.4.5 pydantic-extra-types-2.11.1 pydantic-settings-2.14.1 pydocket-0.21.1 pydub-0.25.1 pygments-2.20.0 pymatting-1.1.15 python-json-logger-4.1.0 python-multipart-0.0.32 python-slugify-8.0.4 pywin32-312 pyyaml-6.0.3 qdrant-client-1.18.0 readchar-4.2.2 redis-8.0.0 referencing-0.37.0 regex-2026.5.9 rembg-2.0.69 requests-oauthlib-2.0.0 rfc3339-validator-0.1.4 rich-15.0.0 rich-rst-2.0.1 rpds-py-0.30.0 ruamel-yaml-0.19.1 ruamel-yaml-clib-0.2.15 safehttpx-0.1.7 safetensors-0.7.0 scikit-image-0.25.2 scipy-1.15.3 semantic-version-2.10.0 semver-3.0.4 shellingham-1.5.4 sqlalchemy-2.0.50 starlette-1.2.1 sympy-1.14.0 taskgroup-0.2.2 text-unidecode-1.3 tifffile-2025.5.10 timm-1.0.27 toml-0.10.2 tomli-2.4.1 tomlkit-0.14.0 torch-2.12.0 torchvision-0.27.0 typer-0.25.1 tzlocal-5.3.1 uncalled-for-0.3.2 uvicorn-0.49.0 wcwidth-0.7.0
+
+[notice] A new release of pip available: 22.2.1 -> 26.1.2
+[notice] To update, run: python.exe -m pip install --upgrade pip
