@@ -24,10 +24,13 @@ import shutil
 import sys
 from pathlib import Path
 
+import os
+
 PROJECT_ROOT = Path(__file__).parent.parent.parent   # Label Studio Project/
 PIPELINE     = PROJECT_ROOT / "pipeline"
 LAB          = PROJECT_ROOT / "lab"
 sys.path.insert(0, str(PIPELINE))
+os.chdir(PIPELINE)   # 모든 상대 경로(output/, data/)가 pipeline/ 기준으로 동작
 
 from dotenv import load_dotenv
 load_dotenv(PROJECT_ROOT / ".env")

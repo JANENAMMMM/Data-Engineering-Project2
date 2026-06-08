@@ -22,10 +22,13 @@ import sys
 import time
 from pathlib import Path
 
+import os
+
 PROJECT_ROOT = Path(__file__).parent.parent.parent   # Label Studio Project/
 PIPELINE     = PROJECT_ROOT / "pipeline"
 LAB          = PROJECT_ROOT / "lab"
 sys.path.insert(0, str(PIPELINE))
+os.chdir(PIPELINE)
 
 from dotenv import load_dotenv
 load_dotenv(PROJECT_ROOT / ".env")
