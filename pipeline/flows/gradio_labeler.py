@@ -59,22 +59,32 @@ PRINTS = [
 BOTTOM_WAIST_RISE = ["하이웨이스트", "normal", "판별불가"]
 BOTTOM_LENGTH     = ["발목", "미디", "초숏", "숏", "판별불가", "카프리", "맥시", "버뮤다"]
 
-QUEUE_DIR          = Path("data/inbox/unlabeled")
-OUTPUT_PATH        = Path("output/manual_labels.jsonl")
-MASKED_ARCHIVE_DIR = Path("data/masked_images_archive/inbox_unlabeled")
+QUEUE_DIR           = Path("data/inbox/unlabeled")
+OUTPUT_PATH         = Path("output/manual_labels.jsonl")
+MASKED_ARCHIVE_DIR  = Path("data/masked_images_archive/inbox_unlabeled")
+CANVAS_CURRENT_PATH = Path("output/canvas_current.jpg")
 
 CLOTHING_TYPE_TO_CATEGORY = {
     "상의": "top", "하의": "bottom", "아우터": "outerwear", "원피스": "dress",
 }
 
 # ── 폴리곤 캔버스 HTML/JS ─────────────────────────────────────────────────────
-# 전략: gr.Image(elem_id="poly-source-img")를 CSS로 숨기고,
-#       JS가 150ms 폴링으로 <img> src를 감지해 canvas에 로드.
-#       base64 WebSocket 전달 방식(불안정)을 완전히 배제.
+# Gradio 6.x에서 gr.HTML 안의 <script>는 Svelte {@ html} innerHTML 삽입 특성상
+# 브라우저가 실행하지 않음. JS는 gr.Blocks(head=CANVAS_HEAD)로 <head>에 주입.
+# CANVAS_HTML: 순수 HTML 요소만 포함 (스크립트 없음).
+# CANVAS_HEAD: <head>에 삽입될 <script> — document 전역에서 정상 실행.
 CANVAS_HTML = """
 <style>
-  /* gr.Image 소스는 DOM에 존재하되 화면에서 숨김 */
-  #poly-source-img { display: none !important; }
+  /* source_img: 작게 표시 (실제 visible → Gradio가 img 정상 로드) */
+  #poly-source-img {
+    margin-top: 6px;
+    opacity: 0.4;
+  }
+  #poly-source-img img {
+    max-height: 40px !important;
+    width: auto !important;
+    border-radius: 4px;
+  }
 
   #poly-canvas {
     cursor: crosshair;
@@ -108,128 +118,139 @@ CANVAS_HTML = """
 <div id="poly-controls">
   <button class="poly-btn" onclick="window.polyUndo()">↩ 되돌리기</button>
   <button class="poly-btn" onclick="window.polyClear()">✕ 초기화</button>
-  <span id="poly-status">이미지 로딩 대기 중...</span>
+  <span id="poly-status">이미지 대기 중...</span>
 </div>
-
-<script>
-(function () {
-  var canvas  = document.getElementById('poly-canvas');
-  var ctx     = canvas.getContext('2d');
-  var pts     = [];
-  var imgEl   = new Image();
-  var lastSrc = '';
-
-  function getCoordTb() {
-    return document.querySelector('#poly-coords textarea');
-  }
-
-  /* ── 캔버스 재렌더 ───────────────────────────────── */
-  function redraw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (imgEl.complete && imgEl.naturalWidth > 0) {
-      ctx.drawImage(imgEl, 0, 0, canvas.width, canvas.height);
-    }
-    if (!pts.length) return;
-
-    ctx.beginPath();
-    ctx.moveTo(pts[0][0], pts[0][1]);
-    for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
-    if (pts.length >= 3) {
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(239,68,68,0.15)';
-      ctx.fill();
-    }
-    ctx.strokeStyle = '#EF4444';
-    ctx.lineWidth   = 2;
-    ctx.stroke();
-
-    pts.forEach(function(p, i) {
-      ctx.beginPath();
-      ctx.arc(p[0], p[1], 5, 0, 2 * Math.PI);
-      ctx.fillStyle   = (i === 0) ? '#16a34a' : '#EF4444';
-      ctx.fill();
-      ctx.strokeStyle = 'white';
-      ctx.lineWidth   = 1.5;
-      ctx.stroke();
-      ctx.fillStyle       = 'white';
-      ctx.font            = 'bold 9px sans-serif';
-      ctx.textAlign       = 'center';
-      ctx.textBaseline    = 'middle';
-      ctx.fillText(String(i + 1), p[0], p[1]);
-    });
-  }
-
-  /* ── 좌표 → Textbox 동기화 ──────────────────────── */
-  function pushCoords() {
-    var tb = getCoordTb();
-    if (!tb) return;
-    var fracs = pts.map(function(p) {
-      return [p[0] / canvas.width, p[1] / canvas.height];
-    });
-    var val = JSON.stringify(fracs);
-    if (tb.value === val) return;
-    tb.value = val;
-    tb.dispatchEvent(new Event('input',  { bubbles: true }));
-    tb.dispatchEvent(new Event('change', { bubbles: true }));
-  }
-
-  /* ── 이미지 로드 ─────────────────────────────────── */
-  function loadFromSrc(src) {
-    if (!src || src === lastSrc) return;
-    lastSrc = src;
-    var img = new Image();
-    img.onload = function() {
-      var maxW  = Math.min(550, img.naturalWidth);
-      var ratio = maxW / img.naturalWidth;
-      canvas.width  = Math.round(img.naturalWidth  * ratio);
-      canvas.height = Math.round(img.naturalHeight * ratio);
-      imgEl = img;
-      pts   = [];
-      pushCoords();
-      redraw();
-      document.getElementById('poly-status').textContent =
-        '클릭으로 꼭짓점 추가 | ↩ 되돌리기 | ✕ 초기화';
-    };
-    img.onerror = function() {
-      document.getElementById('poly-status').textContent = '이미지 로드 실패';
-    };
-    img.src = src;
-  }
-
-  /* ── 클릭 ────────────────────────────────────────── */
-  canvas.addEventListener('click', function(e) {
-    if (e.detail > 1) return;
-    var r = canvas.getBoundingClientRect();
-    var x = Math.round((e.clientX - r.left) * canvas.width  / r.width);
-    var y = Math.round((e.clientY - r.top)  * canvas.height / r.height);
-    pts.push([x, y]);
-    redraw();
-    pushCoords();
-    var n = pts.length;
-    document.getElementById('poly-status').textContent =
-      '점 ' + n + '개' + (n >= 3 ? ' ✓ 폴리곤 완성' : ' (최소 3개 필요)');
-  });
-
-  window.polyUndo = function() {
-    if (pts.length) { pts.pop(); redraw(); pushCoords(); }
-    document.getElementById('poly-status').textContent = '점 ' + pts.length + '개';
-  };
-  window.polyClear = function() {
-    pts = []; redraw(); pushCoords();
-    document.getElementById('poly-status').textContent = '초기화됨. 다시 클릭하세요.';
-  };
-
-  /* ── gr.Image src 폴링 (150ms) ───────────────────── */
-  // gr.Image(elem_id="poly-source-img")의 <img> src를 감지해 canvas 로드.
-  // visible=True + CSS display:none → DOM에 존재, 화면에만 숨김.
-  setInterval(function() {
-    var el = document.querySelector('#poly-source-img img');
-    if (!el || !el.src) return;
-    loadFromSrc(el.src);
-  }, 150);
-})();
-</script>
 """
+
+# JS는 gr.Blocks(head=CANVAS_HEAD)로 <head>에 삽입 → 정상 실행 보장.
+# setInterval로 #poly-canvas 요소가 Svelte 렌더링 후 등장할 때까지 대기.
+CANVAS_HEAD = """<script>
+(function () {
+  var _init = setInterval(function () {
+    var canvas = document.getElementById('poly-canvas');
+    if (!canvas) return;
+    clearInterval(_init);
+
+    var ctx  = canvas.getContext('2d');
+    var pts  = [];
+    var imgEl = new Image();
+    var _lastStatus   = '';
+    var _lastCanvasVal = '';
+
+    function getCoordTb() {
+      return document.querySelector('#poly-coords textarea');
+    }
+
+    function redraw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (imgEl.complete && imgEl.naturalWidth > 0) {
+        ctx.drawImage(imgEl, 0, 0, canvas.width, canvas.height);
+      }
+      if (!pts.length) return;
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0], pts[0][1]);
+      for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+      if (pts.length >= 3) {
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(239,68,68,0.15)';
+        ctx.fill();
+      }
+      ctx.strokeStyle = '#EF4444';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      pts.forEach(function (p, i) {
+        ctx.beginPath();
+        ctx.arc(p[0], p[1], 5, 0, 2 * Math.PI);
+        ctx.fillStyle   = i === 0 ? '#16a34a' : '#EF4444';
+        ctx.fill();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth   = 1.5;
+        ctx.stroke();
+        ctx.fillStyle    = 'white';
+        ctx.font         = 'bold 9px sans-serif';
+        ctx.textAlign    = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(i + 1), p[0], p[1]);
+      });
+    }
+
+    function pushCoords() {
+      var tb = getCoordTb();
+      if (!tb) return;
+      var fracs = pts.map(function (p) {
+        return [p[0] / canvas.width, p[1] / canvas.height];
+      });
+      var val = JSON.stringify(fracs);
+      if (tb.value === val) return;
+      tb.value = val;
+      tb.dispatchEvent(new Event('input',  { bubbles: true }));
+      tb.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    function setStatus(msg) {
+      if (msg === _lastStatus) return;
+      _lastStatus = msg;
+      var el = document.getElementById('poly-status');
+      if (el) el.textContent = msg;
+    }
+
+    function loadImage(src) {
+      if (!src) return;
+      var img = new Image();
+      img.onload = function () {
+        var maxW  = Math.min(550, img.naturalWidth);
+        var ratio = img.naturalWidth > 0 ? maxW / img.naturalWidth : 1;
+        canvas.width  = Math.round(img.naturalWidth  * ratio);
+        canvas.height = Math.round(img.naturalHeight * ratio);
+        imgEl = img;
+        pts   = [];
+        pushCoords();
+        redraw();
+        setStatus('클릭으로 꼭짓점 추가 | ↩ 되돌리기 | ✕ 초기화');
+      };
+      img.onerror = function () {
+        var name = src.split('/').pop().split('?')[0];
+        setStatus('[오류] 이미지 로드 실패: ' + name);
+      };
+      img.src = src;
+    }
+
+    canvas.addEventListener('click', function (e) {
+      if (e.detail > 1) return;
+      var r = canvas.getBoundingClientRect();
+      var x = Math.round((e.clientX - r.left) * canvas.width  / r.width);
+      var y = Math.round((e.clientY - r.top)  * canvas.height / r.height);
+      pts.push([x, y]);
+      redraw();
+      pushCoords();
+      var n = pts.length;
+      setStatus('점 ' + n + '개' + (n >= 3 ? ' ✓ 폴리곤 완성' : ' (최소 3개 필요)'));
+    });
+
+    window.polyUndo = function () {
+      if (pts.length) { pts.pop(); redraw(); pushCoords(); }
+      setStatus('점 ' + pts.length + '개');
+    };
+    window.polyClear = function () {
+      pts = []; redraw(); pushCoords();
+      setStatus('초기화됨. 다시 클릭하세요.');
+    };
+
+    /* #poly-source-img img src 폴링: gr.Image(visible=True)가 로드한 src를 읽어 canvas에 그림 */
+    setInterval(function () {
+      var el = document.querySelector('#poly-source-img img');
+      if (!el) { setStatus('이미지 대기 중...'); return; }
+      var src = el.src || el.getAttribute('src') || '';
+      if (!src || src === _lastCanvasVal) return;
+      _lastCanvasVal = src;
+      setStatus('이미지 로딩 중...');
+      loadImage(src);
+    }, 200);
+
+    setStatus('이미지 대기 중...');
+  }, 100);
+})();
+</script>"""
 
 
 # ── 유틸 ─────────────────────────────────────────────────────────────────────
@@ -324,7 +345,7 @@ def build_app() -> gr.Blocks:
         total  = state["total_done"] + len(q)
         if idx >= len(q):
             return (
-                None,   # source_img: None → 이미지 없음
+                None,   # source_img: None → img 없음 → JS 로드 안 함
                 None,   # img_preview
                 f"완료! 전체 {total}개 처리됨",
                 state,
@@ -423,7 +444,8 @@ def build_app() -> gr.Blocks:
             return None
         return _compute_preview_polygon(coords_json, q[idx])
 
-    with gr.Blocks(title="K-Fashion 수동 라벨링", theme=gr.themes.Soft()) as app:
+    with gr.Blocks(title="K-Fashion 수동 라벨링", theme=gr.themes.Soft(),
+                   head=CANVAS_HEAD) as app:
         gr.Markdown("# K-Fashion 수동 라벨링")
         gr.Markdown(
             "**사용법:** 이미지 위 클릭으로 의류 영역 꼭짓점을 찍으세요 (3개 이상 → 폴리곤 완성). "
@@ -433,7 +455,8 @@ def build_app() -> gr.Blocks:
         state    = gr.State(_refresh())
         progress = gr.Textbox(label="진행", interactive=False)
 
-        # Gradio가 이미지를 temp URL로 서빙. CSS로 숨기고 JS가 src를 폴링.
+        # Gradio가 이미지를 로드해 <img src="..."> 설정 → JS가 src 폴링으로 캔버스에 그림.
+        # visible=True (실제 표시) 필수 — hidden 시 Gradio가 img 로드 자체를 생략함.
         source_img = gr.Image(
             elem_id="poly-source-img",
             type="pil",
@@ -515,4 +538,7 @@ def build_app() -> gr.Blocks:
 
 
 if __name__ == "__main__":
-    build_app().launch(share=False)
+    build_app().launch(
+        share=False,
+        allowed_paths=[str(Path("output").resolve())],
+    )

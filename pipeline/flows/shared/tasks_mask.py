@@ -79,9 +79,11 @@ def auto_mask_rembg(image_paths: list[str], output_dir: str) -> list[dict]:
     output_dir_p.mkdir(parents=True, exist_ok=True)
     results: list[dict] = []
 
+    print(f"\n  [rembg]  {len(image_paths)}건 배경 제거 시작  →  {output_dir}")
     for img_path_str in image_paths:
         img_path = Path(img_path_str)
         try:
+            print(f"  ▸ {img_path.stem}  배경 제거 중...", end="", flush=True)
             removed = remove(img_path.read_bytes())
             fg      = Image.open(io.BytesIO(removed)).convert("RGBA")
             bg      = Image.new("RGBA", fg.size, (255, 255, 255, 255))
@@ -95,8 +97,11 @@ def auto_mask_rembg(image_paths: list[str], output_dir: str) -> list[dict]:
                 "category":    "unknown",
                 "output_path": str(out_path),
             })
+            w, h = result_img.size
+            print(f"  ✔  {out_path.name}  ({w}×{h})")
         except Exception as e:
-            print(f"rembg 실패 {img_path.name}: {e}")
+            print(f"  ✗")
+            print(f"  rembg 실패 {img_path.name}: {e}")
 
-    print(f"rembg 자동 마스킹 완료: {len(results)}개")
+    print(f"\n  [rembg]  자동 마스킹 완료: {len(results)}개")
     return results

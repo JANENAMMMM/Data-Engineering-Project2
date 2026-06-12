@@ -155,8 +155,29 @@ def upsert_rdb(rows: list[dict], status: str = "complete") -> None:
     batch_ids: list[str] = []
     errors    = 0
 
+    _status_label = {
+        "pending_label": "pending_label  (Gradio 라벨링 대기)",
+        "complete":      "complete       (전체 색인 완료)",
+        "vlm_only":      "vlm_only       (VLM 출력만 색인)",
+    }.get(status, status)
+    print(f"\n  [Turso DB]  {len(rows)}건 INSERT OR REPLACE  |  status='{_status_label}'")
+    print(f"  {'file_id':<14} {'category':<12} {'status':<16} 주요 필드")
+    print(f"  {'-'*70}")
+
     for i, row in enumerate(rows):
         try:
+            # 행별 진행 로그
+            fid  = row.get("file_id", "?")
+            cat  = row.get("category", "?")
+            if status == "pending_label":
+                url  = (row.get("image_url") or "")[:50]
+                print(f"  ▸ {fid:<14} {cat:<12} {status:<16} image_url={url}")
+            elif status in ("complete", "vlm_only"):
+                col  = row.get("label_color") or "-"
+                cap  = (row.get("dense_caption") or "")[:45]
+                ps   = row.get("pattern_size") or "-"
+                print(f"  ▸ {fid:<14} {cat:<12} {status:<16} 색={col:<8}  ps={ps:<6}  {cap}...")
+
             with db_lock:
                 cur.execute("""
                     INSERT OR REPLACE INTO fashion_items (
@@ -220,4 +241,9 @@ def upsert_rdb(rows: list[dict], status: str = "complete") -> None:
         conn.commit()
         append_to_cache(batch_ids)
 
-    print(f"RDB 적재 완료: {len(rows) - errors}건 성공, {errors}건 실패")
+    _completion_note = {
+        "pending_label": " → Gradio 라벨링 대기 중",
+        "complete":      " → 전체 색인 완료",
+        "vlm_only":      " → VLM 부분 색인 완료",
+    }.get(status, "")
+    print(f"\n  [Turso DB]  DB 등록 완료: {len(rows) - errors}건 성공 / {errors}건 실패  |  status='{status}'{_completion_note}")

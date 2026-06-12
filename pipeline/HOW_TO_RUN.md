@@ -127,15 +127,22 @@ cp "../lab/K_fashion 이미지 sample/원천데이터/원천데이터_1/레트�
 ### 2-2. 테스트 스크립트 실행
 
 ```bash
-# lab/scripts/ 에서 실행 (pipeline/ 디렉토리와 무관하게 작동)
-python "../lab/scripts/test_pipeline.py"
+# pipeline/ 에서 실행
+python -X utf8 scripts/test_pipeline.py
 ```
 
 또는 Python 코드에서 직접 호출:
 
 ```python
-import asyncio, sys
-sys.path.insert(0, ".")           # pipeline/ 에서 실행 시
+import asyncio, sys, os
+from pathlib import Path
+from dotenv import load_dotenv
+
+_p = Path.cwd()
+PIPELINE = _p if (_p / "flows").exists() else _p / "pipeline"
+sys.path.insert(0, str(PIPELINE)); os.chdir(PIPELINE)
+load_dotenv(PIPELINE.parent / ".env")
+
 from flows.ingest_labeled import ingest_labeled_flow
 
 asyncio.run(ingest_labeled_flow(
@@ -159,7 +166,8 @@ asyncio.run(ingest_labeled_flow(
 DB 결과 조회:
 
 ```bash
-python "../lab/scripts/check_turso_schema.py"
+# pipeline/ 에서
+python scripts/check_turso_schema.py
 ```
 
 ---
@@ -173,27 +181,45 @@ Gradio 대기 없이 완전 자동으로 처리됩니다.
 
 동일 이미지를 다시 처리하려면 캐시에서 해당 ID를 제거해야 합니다.
 
+> **`test_unlabeled_full.py` (Scenario B full)** 는 실행 시작 시 자동으로 캐시와 `manual_labels.jsonl` 을 정리합니다. 별도 수작업 불필요.
+
+vlm_only 테스트 또는 수동 정리가 필요한 경우:
+
 ```python
 # Python으로 실행 (PowerShell의 Set-Content는 BOM 문제 발생)
+import os
 from pathlib import Path
+_p = Path.cwd()
+PIPELINE = _p if (_p / "flows").exists() else _p / "pipeline"
+os.chdir(PIPELINE)
+
 cache = Path("output/indexed_ids.txt")
 ids = set(cache.read_text(encoding="utf-8").splitlines()) if cache.exists() else set()
 ids -= {"1028690", "1029079", "101858"}   # 제거할 file_id
 cache.write_text("\n".join(sorted(ids)), encoding="utf-8")
 ```
 
+또는 프로젝트 루트의 `erase_cash.py` 를 실행하면 캐시 + `manual_labels.jsonl` 을 한 번에 정리합니다.
+
 ### 3-2. 테스트 실행
 
 ```bash
 # pipeline/ 에서
-python "../lab/scripts/test_unlabeled.py"
+python -X utf8 scripts/test_unlabeled.py
 ```
 
 또는 직접 호출:
 
 ```python
-import asyncio, sys
-sys.path.insert(0, ".")
+import asyncio, sys, os
+from pathlib import Path
+from dotenv import load_dotenv
+
+_p = Path.cwd()
+PIPELINE = _p if (_p / "flows").exists() else _p / "pipeline"
+sys.path.insert(0, str(PIPELINE)); os.chdir(PIPELINE)
+load_dotenv(PIPELINE.parent / ".env")
+
 from flows.ingest_unlabeled import ingest_unlabeled_flow
 
 asyncio.run(ingest_unlabeled_flow(
@@ -235,15 +261,21 @@ python flows/gradio_labeler.py
 
 ```bash
 # 다른 터미널, pipeline/ 에서
-python "../lab/scripts/test_unlabeled_full.py"
+python -X utf8 scripts/test_unlabeled_full.py
 ```
 
 또는 직접 호출:
 
 ```python
 import asyncio, sys, os
-sys.path.insert(0, ".")
-os.chdir(".")   # pipeline/ 기준
+from pathlib import Path
+from dotenv import load_dotenv
+
+_p = Path.cwd()
+PIPELINE = _p if (_p / "flows").exists() else _p / "pipeline"
+sys.path.insert(0, str(PIPELINE)); os.chdir(PIPELINE)
+load_dotenv(PIPELINE.parent / ".env")
+
 from flows.ingest_unlabeled import ingest_unlabeled_flow
 
 asyncio.run(ingest_unlabeled_flow(
@@ -262,16 +294,18 @@ asyncio.run(ingest_unlabeled_flow(
 **라벨링 순서:**
 
 ```
-① 이미지가 자동으로 로드됨
-② 왼쪽 편집기에서 의류 영역을 브러시로 빨간색으로 칠함
-③ "🔍 마스킹 미리보기" 클릭으로 결과 확인
+① 이미지가 캔버스에 자동으로 로드됨
+② 캔버스 위를 클릭해 의류 영역의 꼭짓점을 찍음 (최소 3개)
+   - 첫 번째 점은 초록색, 이후는 빨간색
+   - ↩ 되돌리기 / ✕ 초기화 버튼 사용 가능
+③ "🔍 마스킹 미리보기" 클릭으로 폴리곤 마스킹 결과 확인
 ④ 오른쪽에서 라벨 입력:
    - 의류 타입 선택 (상의 / 하의 / 아우터 / 원피스)
    - 세부 카테고리 선택
    - 색상, 소재, 핏, 기장 등 입력
 ⑤ 하나의 이미지에 여러 의류가 있는 경우:
-   → 첫 항목 칠하기 + 라벨 → [+ 항목 추가] 클릭
-   → 다음 항목 칠하기 + 라벨 → [+ 항목 추가] 반복
+   → 첫 항목 폴리곤 + 라벨 → [+ 항목 추가] 클릭 (캔버스 초기화됨)
+   → 다음 항목 폴리곤 + 라벨 → [+ 항목 추가] 반복
    → 마지막 항목 → [저장 후 다음 이미지 →] 클릭
 ⑥ 모든 이미지 완료 → 파이프라인 자동 재개
 ```
@@ -291,7 +325,15 @@ Scenario B 완료: 3건 (status=complete)
 ### 4-5. 결과 확인
 
 ```python
-# Turso DB 확인
+import sys, os
+from pathlib import Path
+from dotenv import load_dotenv
+
+_p = Path.cwd()
+PIPELINE = _p if (_p / "flows").exists() else _p / "pipeline"
+sys.path.insert(0, str(PIPELINE)); os.chdir(PIPELINE)
+load_dotenv(PIPELINE.parent / ".env")
+
 from libsql import connect
 from src.config import DB_URL, DB_ACCESS_TOKEN
 
@@ -396,8 +438,12 @@ unlabeled inbox: data/inbox/unlabeled
 ### 같은 이미지가 "이미 처리됨"으로 스킵될 때
 
 ```python
-# pipeline/ 에서 실행
+import os
 from pathlib import Path
+_p = Path.cwd()
+PIPELINE = _p if (_p / "flows").exists() else _p / "pipeline"
+os.chdir(PIPELINE)
+
 cache = Path("output/indexed_ids.txt")
 ids = set(cache.read_text(encoding="utf-8").splitlines()) if cache.exists() else set()
 ids -= {"제거할_file_id_1", "제거할_file_id_2"}
@@ -423,13 +469,14 @@ ls data/inbox/unlabeled/
 tail -10 output/manual_labels.jsonl
 ```
 
-### Gradio 브러시가 작동하지 않을 때
+### Gradio 캔버스에 이미지가 로드되지 않을 때
 
-Gradio 버전이 4.0 이상인지 확인합니다.
+`python flows/gradio_labeler.py` 를 `pipeline/` 디렉토리에서 실행했는지 확인합니다.  
+`data/inbox/unlabeled/` 에 처리할 `.jpg` 파일이 있어야 캔버스에 이미지가 뜹니다.
 
 ```bash
-pip show gradio
-# Version: 6.x 권장
+# pipeline/ 에서
+ls data/inbox/unlabeled/
 ```
 
 ### VLM 캡셔닝 rate limit 오류
@@ -446,10 +493,10 @@ GEMINI_MODEL = "gemini-2.5-flash-lite"   # 저렴한 모델
 
 ```bash
 # .env 파일 위치 확인 (프로젝트 루트에 있어야 함)
-ls "../.env"
+ls ../.env
 
-# DB 연결 테스트
-python "../lab/scripts/check_turso_schema.py"
+# DB 연결 테스트 (pipeline/ 에서)
+python scripts/check_turso_schema.py
 ```
 
 ---
@@ -458,8 +505,5 @@ python "../lab/scripts/check_turso_schema.py"
 
 | 문서 | 위치 |
 |---|---|
-| 파이프라인 전체 구조 | `pipeline/README.md` |
-| Flow 상세 설명 | `pipeline/flows/README.md` |
-| 소스 라이브러리 설명 | `pipeline/src/README.md` |
-| 자동화 데몬 설명 | `pipeline/deployments/README.md` |
-| 데이터 디렉토리 구조 | `pipeline/data/README.md` |
+| 파이프라인 전체 구조 · 스키마 · 구현 현황 | `pipeline/README.md` |
+| 소스 라이브러리 상세 설명 | `pipeline/src/README.md` |

@@ -89,9 +89,17 @@ def upsert_qdrant(
     points: list[PointStruct] = []
     total_uploaded = 0
 
+    print(f"\n  [Qdrant]  {len(rows)}건 벡터 색인  |  컬렉션: {VISUAL_COLLECTION}  dim={VECTOR_DIM}")
+    print(f"  {'point_id':<14} {'file_id':<14} {'category':<12} {'color':<10} {'tags (앞 50자)'}")
+    print(f"  {'-'*70}")
+
     for i, (row, vec) in enumerate(zip(rows, image_vectors)):
         file_id  = str(row["file_id"])
         category = row.get("category", "unknown")
+        point_id = _make_point_id(file_id, category)
+        col   = row.get("label_color") or "-"
+        tags  = (row.get("flat_tags") or "")[:50]
+        print(f"  ▸ {point_id:<14} {file_id:<14} {category:<12} {col:<10} {tags}...")
 
         point = PointStruct(
             id=_make_point_id(file_id, category),
@@ -135,5 +143,5 @@ def upsert_qdrant(
         client.upsert(collection_name=VISUAL_COLLECTION, points=points)
         total_uploaded += len(points)
 
-    print(f"Qdrant 적재 완료: {total_uploaded}건")
+    print(f"\n  [Qdrant]  색인 완료: {total_uploaded}건  |  컬렉션: {VISUAL_COLLECTION}")
     return total_uploaded

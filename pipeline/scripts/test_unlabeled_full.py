@@ -20,6 +20,7 @@ Scenario B 통합 테스트 — 사람 어노테이션 포함 (mode='full')
 from __future__ import annotations
 
 import asyncio
+import json
 import shutil
 import sys
 from pathlib import Path
@@ -40,11 +41,50 @@ SAMPLE_IMAGES = [
     LAB / "K_fashion 이미지 sample" / "원천데이터" / "원천데이터_1" / "레트로" / "1029079.jpg",
     LAB / "K_fashion 이미지 sample" / "원천데이터" / "원천데이터_1" / "로맨틱" / "101858.jpg",
 ]
-INBOX_DIR = PIPELINE / "data" / "inbox" / "unlabeled"
+INBOX_DIR    = PIPELINE / "data" / "inbox" / "unlabeled"
+TEST_IDS     = {p.stem for p in SAMPLE_IMAGES}
 
 PASS = "[OK]"
 FAIL = "[FAIL]"
 results: dict[str, str] = {}
+
+
+def clean_test_artifacts() -> None:
+    """이전 테스트 흔적 제거: indexed_ids.txt + manual_labels.jsonl + 마스크 아카이브에서 TEST_IDS 항목 삭제"""
+    cache = PIPELINE / "output" / "indexed_ids.txt"
+    if cache.exists():
+        ids = {l for l in cache.read_text(encoding="utf-8").splitlines() if l.strip()}
+        before = len(ids)
+        ids -= TEST_IDS
+        cache.write_text("\n".join(sorted(ids)), encoding="utf-8")
+        if before != len(ids):
+            print(f"  캐시 정리: {before} → {len(ids)}건  ({before - len(ids)}개 제거)")
+
+    labels = PIPELINE / "output" / "manual_labels.jsonl"
+    if labels.exists():
+        kept, removed = [], 0
+        for line in labels.read_text(encoding="utf-8").splitlines():
+            try:
+                if json.loads(line).get("file_id") in TEST_IDS:
+                    removed += 1
+                    continue
+            except Exception:
+                pass
+            kept.append(line)
+        labels.write_text("\n".join(kept) + ("\n" if kept else ""), encoding="utf-8")
+        if removed:
+            print(f"  manual_labels 정리: {removed}건 제거")
+
+    # 이전 실행에서 생성된 마스크 파일 정리 (R2 업로드 오염 방지)
+    archive = PIPELINE / "data" / "masked_images_archive" / "inbox_unlabeled"
+    if archive.exists():
+        removed_masks = 0
+        for fid in TEST_IDS:
+            for f in archive.glob(f"{fid}_*.jpg"):
+                f.unlink()
+                removed_masks += 1
+        if removed_masks:
+            print(f"  마스크 아카이브 정리: {removed_masks}개 제거")
 
 
 def setup_inbox() -> list[str]:
@@ -109,6 +149,9 @@ async def main():
     print("Scenario B 테스트 (mode=full) — 사람 어노테이션 포함")
     print("  rembg → pending 등록 → Gradio 라벨링 → 완전 색인")
     print("=" * 60)
+
+    print("\n─── 이전 테스트 흔적 정리 ───")
+    clean_test_artifacts()
 
     print("\n─── inbox 준비 ───")
     file_ids = setup_inbox()
